@@ -43,14 +43,14 @@ class CameraCalibrator(object):
             print('No element named new_camera_matrix was found in {}'.format(param_file))
 
         dist = dict()
-        dist_data = root.find('camera_distoration')
+        dist_data = root.find('camera_distortion')
         if dist_data:
             for data in dist_data.iter():
                 dist[data.tag] = data.text
             for i in range(5):
                 self.dist[0][i]= float(dist['data{}'.format(i)])
         else:
-            print('No element named camera_distoration was found in {}'.format(param_file))
+            print('No element named camera_distortion was found in {}'.format(param_file))
 
         roi = dict()
         roi_data = root.find('roi')
@@ -84,7 +84,7 @@ class CameraCalibrator(object):
             child.text = str(elem)
             new_node.append(child)
 
-        dist_node = ET.Element('camera_distoration')
+        dist_node = ET.Element('camera_distortion')
         root.append(dist_node)
         for i, elem in enumerate(self.dist.flatten()):
             child = ET.Element('data{}'.format(i))
