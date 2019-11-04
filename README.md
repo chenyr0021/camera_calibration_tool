@@ -1,8 +1,12 @@
 # camera_calibration_tool
 
-camera_calibration_tool is used to easily calibrate and distort camera using 
-opencv-python. With only one line of command, you can get parameters of your 
-camera or rectify your video. It is similar with calibration package of ROS.
+camera_calibration_tool is used to easily calibrate and rectify camera using 
+opencv-python. 
+
+With only one line of command, you can get parameters of your 
+camera or rectify your video. 
+
+It is similar with calibration package of ROS.
 
 
 # Content
@@ -58,7 +62,8 @@ run:
 ```
 python3 calibration.py --image_size 1920x1080 --mode rectify --video_path test.mp4
 ```
-**Replace the value according to your video.**
+**Replace the value according to your video. Only `mp4` and `avi` are tested. 
+Not sure about other format.**
 
 **NOTE: image_size should be the same with chessboard images you used to calibrate.**
 
@@ -68,7 +73,7 @@ To rectify camera, run:
 ```
 python3 calibration.py --image_size 1920x1080 --mode rectify --camera_id 0
 ```
-**Replace the value according to your video.**
+**Replace the value according to your camera.**
 
 **NOTE: image_size should be the same with chessboard images you used to calibrate.**
 
