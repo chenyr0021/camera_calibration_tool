@@ -192,7 +192,10 @@ if __name__ == '__main__':
     parser.add_argument('--camera_id', type=int, help='camera_id, default=0', default=0)
     args = parser.parse_args()
 
+<<<<<<< HEAD
+=======
     
+>>>>>>> b47da7e8dac0b798ae8f2ce9ffc1d7dec5c21a92
 
 
     calibrator = CameraCalibrator((1920, 1080))
