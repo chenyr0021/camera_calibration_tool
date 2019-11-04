@@ -1,7 +1,20 @@
 # camera_calibration_tool
-使用张正友相机标定法进行相机标定及矫正。
 
-本代码在以下环境测试通过：
+camera_calibration_tool is used to easily calibrate and distort camera using 
+opencv-python. With only one line of command, you can get parameters of your 
+camera or rectify your video. It is similar with calibration package of ROS.
+
+
+# Content
+* [camera_calibration_tool](#camera_calibration_tool)
+* [Content](#content)
+* [Usage](#usage)
+    * [Calibration](#calibration)
+    * [Rectify video](#rectify-video)
+    * [Rectify camera](#rectify-camera)
+* [Command line parameters](#command-line-parameters)
+
+# Requirement
 
 This code works well in the following environment:
 
@@ -9,19 +22,9 @@ Ubuntu: 16.04
 
 Python: 3.5.2
 
-Opencv: 3.2.0
+OpenCV: 3.2.0
 
-# Content
-* [camera_calibration_tool](#camera_calibration_tool)
-* [Content](#content)
-* [Usage](#usage)
-    * [Calibration](##calibration)
-    * [Rectify video](##rectifyvideo)
-    * [Rectify camera](##rectifycamera)
-* [Command line parameters](#command-line-parameters)
-
-# Requirement
-
+Package requirement:
 - glob
 - numpy
 - xml
@@ -29,11 +32,12 @@ Opencv: 3.2.0
 # Usage
 
 This code can be used to calculate matrix and distortion coefficients 
-of your camera, and rectify video/camera with these parameteres.
+of your camera, and rectify video/camera with these parameters.
 
 ## Calibration
 
-1. Prepare more than 10 images of chessboard photoed by your camera. 
+1. Prepare more than 10 images of chessboard photoed by your camera 
+in different position and direction. 
 2. Be sure they are in the format of 'JPG' or 'jpg' or 'png'. 
 (They are better to be in the same format, because I do not know 
 if it will work or not.)
