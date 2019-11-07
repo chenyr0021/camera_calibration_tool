@@ -86,7 +86,7 @@ All the parameters and their actions are listed here:
 ```
 python3 calibration.py [option] [value]
 ```
-option|type|help|sample value
+option|type|help|example
 ------|----|----|------------|
 --image_size|str|width and height of image|1920x1080
 --mode|str|to calibrate or rectify| choose from calibrate/rectify
