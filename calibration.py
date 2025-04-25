@@ -7,18 +7,20 @@ import glob
 import xml.etree.ElementTree as ET
 import argparse
 
+
 class CameraCalibrator(object):
-    def __init__(self, image_size:tuple):
+
+    def __init__(self, image_size: tuple):
         super(CameraCalibrator, self).__init__()
         self.image_size = image_size
-        self.matrix = np.zeros((3, 3), np.float)
-        self.new_camera_matrix = np.zeros((3, 3), np.float)
-        self.dist = np.zeros((1, 5))
-        self.roi = np.zeros(4, np.int)
+        self.matrix = np.zeros((3, 3), np.float32)
+        self.new_camera_matrix = np.zeros((3, 3), np.float32)
+        self.dist = np.zeros((1, 5), np.float32)
+        self.roi = np.zeros(4, np.int32)
 
-    def load_params(self, param_file:str='camera_params.xml'):
+    def load_params(self, param_file: str = 'camera_params.xml'):
         if not os.path.exists(param_file):
-            print("File {} does not exist.",format(param_file))
+            print("File {} does not exist.", format(param_file))
             exit(-1)
         tree = ET.parse(param_file)
         root = tree.getroot()
@@ -48,7 +50,7 @@ class CameraCalibrator(object):
             for data in dist_data.iter():
                 dist[data.tag] = data.text
             for i in range(5):
-                self.dist[0][i]= float(dist['data{}'.format(i)])
+                self.dist[0][i] = float(dist['data{}'.format(i)])
         else:
             print('No element named camera_distortion was found in {}'.format(param_file))
 
@@ -101,13 +103,12 @@ class CameraCalibrator(object):
         tree.write(save_path, 'UTF-8')
         print("Saved params in {}.".format(save_path))
 
-
     def cal_real_corner(self, corner_height, corner_width, square_size):
         obj_corner = np.zeros([corner_height * corner_width, 3], np.float32)
         obj_corner[:, :2] = np.mgrid[0:corner_height, 0:corner_width].T.reshape(-1, 2)  # (w*h)*2
         return obj_corner * square_size
 
-    def calibration(self, corner_height:int, corner_width:int, square_size:float):
+    def calibration(self, corner_height: int, corner_width: int, square_size: float):
         file_names = glob.glob('./chess/*.JPG') + glob.glob('./chess/*.jpg') + glob.glob('./chess/*.png')
         objs_corner = []
         imgs_corner = []
@@ -126,20 +127,23 @@ class CameraCalibrator(object):
             # append to img_corners
             if ret:
                 objs_corner.append(obj_corner)
-                img_corners = cv.cornerSubPix(gray, img_corners, winSize=(square_size//2, square_size//2),
-                                              zeroZone=(-1, -1), criteria=criteria)
+                img_corners = cv.cornerSubPix(gray,
+                                              img_corners,
+                                              winSize=(square_size // 2, square_size // 2),
+                                              zeroZone=(-1, -1),
+                                              criteria=criteria)
                 imgs_corner.append(img_corners)
             else:
                 print("Fail to find corners in {}.".format(file_name))
 
         # calibration
-        ret, self.matrix, self.dist, rvecs, tveces = cv.calibrateCamera(objs_corner, imgs_corner, self.image_size, None, None)
+        ret, self.matrix, self.dist, rvecs, tveces = cv.calibrateCamera(objs_corner, imgs_corner, self.image_size, None,
+                                                                        None)
         self.new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(self.matrix, self.dist, self.image_size, alpha=1)
         self.roi = np.array(roi)
         return ret
 
-
-    def rectify_video(self, video_path:str):
+    def rectify_video(self, video_path: str):
         self.load_params()
         cap = cv.VideoCapture(video_path)
         if not cap.isOpened():
@@ -148,7 +152,7 @@ class CameraCalibrator(object):
         fourcc = int(cap.get(cv.CAP_PROP_FOURCC))
         out_format = video_path.split('.')[-1]
         fps = int(cap.get(cv.CAP_PROP_FPS))
-        out = cv.VideoWriter(filename='out.'+out_format, fourcc=0x00000021, fps=fps, frameSize=self.image_size)
+        out = cv.VideoWriter(filename='out.' + out_format, fourcc=0x00000021, fps=fps, frameSize=self.image_size)
         cv.namedWindow("origin", cv.WINDOW_NORMAL)
         cv.namedWindow("dst", cv.WINDOW_NORMAL)
         frame_count = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
@@ -166,7 +170,7 @@ class CameraCalibrator(object):
         cv.destroyAllWindows()
         return True
 
-    def rectify_camera(self, camera_id:int):
+    def rectify_camera(self, camera_id: int):
         self.load_params()
         cap = cv.VideoCapture(camera_id)
         if not cap.isOpened():
@@ -186,7 +190,6 @@ class CameraCalibrator(object):
         cv.destroyAllWindows()
         return True
 
-
     def rectify_image(self, img):
         if not isinstance(img, np.ndarray):
             AssertionError("Image type '{}' is not numpy.ndarray.".format(type(img)))
@@ -199,10 +202,10 @@ class CameraCalibrator(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image_size', type= str, help='width*height of image')
+    parser.add_argument('--image_size', type=str, help='width x height of image, e.g. 1920x1080')
     parser.add_argument('--mode', type=str, choices=['calibrate', 'rectify'], help='to calibrate or rectify')
     parser.add_argument('--square', type=int, help='size of chessboard square, by mm')
-    parser.add_argument('--corner', type=str, help='width*height of chessboard corner')
+    parser.add_argument('--corner', type=str, help='width x height of chessboard corner, e.g. 8x6')
     parser.add_argument('--video_path', type=str, help='video to rectify')
     parser.add_argument('--camera_id', type=int, help='camera_id, default=0', default=0)
     args = parser.parse_args()
@@ -210,10 +213,14 @@ if __name__ == '__main__':
 
     try:
         image_size = tuple(int(i) for i in args.image_size.split('x'))
-        calibrator = CameraCalibrator(image_size)
-    except:
+    except Exception as e:
         print("Invalid/Missing parameter: --image_size. Sample: \n\n"
-              "    --image_size 1920*1080\n")
+              "    --image_size 1920x1080\n")
+        print(e)
+    try:
+        calibrator = CameraCalibrator(image_size)
+    except Exception as e:
+        print(f"Error when creating CameraCalibrator: {e}")
         exit(-1)
 
     if args.mode == 'calibrate':
